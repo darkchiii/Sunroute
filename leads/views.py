@@ -1,10 +1,8 @@
 from django.shortcuts import render
 import pandas as pd
 from geopy.geocoders import Nominatim
-from django.core.files.storage import FileSystemStorage
 import folium
 import time
-import os
 import certifi
 import ssl
 
@@ -17,40 +15,34 @@ def upload_file(request):
         start_date = request.POST['start_date']
         end_date = request.POST['end_date']
 
-        fs = FileSystemStorage()
-        filename = fs.save(file.name, file)
-        file_path = fs.path(filename)
+        try:
+            leads_df = pd.read_excel(file)
+            mask = (leads_df['Data przekazania'] > start_date) & (leads_df['Data przekazania'] < end_date)
+            filtered_leads = leads_df.loc[mask]
+            leads_data = []
+            for index, row in filtered_leads.iterrows():
+                try:
+                    location = geolocator.geocode(row['Kod pocztowy'], timeout=10)
 
-        if not os.path.exists(file_path):
-            return render(request, 'leads/upload.html', {'error': 'Nie udało się zapisać pliku.'})
-
-        leads_df = pd.read_excel(file_path)
-        mask = (leads_df['Data przekazania'] > start_date) & (leads_df['Data przekazania'] <= end_date)
-
-        filtered_leads = leads_df.loc[mask]
-
-        leads_data = []
-        for index, row in filtered_leads.iterrows():
-            try:
-                location = geolocator.geocode(row['Kod pocztowy'], timeout=10)
-                if location:
-                    lead_info = {
-                        'lat': location.latitude,
-                        'lon': location.longitude,
-                        'name': row['Imię i nazwisko'],
-                        'phone': row['Telefon'],
-                        'postal_code': row['Kod pocztowy'],
-                        'monthly_fee': row['Wysokość mc opłat'],
-                        'placement': row['Miejsce instalacji'],
-                        'when': row['Kiedy instalacja'],
-                        'notes': row['Uwagi']
-                    }
-                    leads_data.append(lead_info)
-                else:
-                    leads_data.append(None)
-                # time.sleep(1)
-            except Exception as e:
-                print(f"Błąd geokodowania dla {row['Kod pocztowy']}: {e}")
+                    if location:
+                        lead_info = {
+                            'lat': location.latitude,
+                            'lon': location.longitude,
+                            'name': row['Imię i nazwisko'],
+                            'phone': row['Telefon'],
+                            'postal_code': row['Kod pocztowy'],
+                            'monthly_fee': row['Wysokość mc opłat'],
+                            'placement': row['Miejsce instalacji'],
+                            'when': row['Kiedy instalacja'],
+                            'notes': row['Uwagi']
+                        }
+                        leads_data.append(lead_info)
+                    else:
+                        leads_data.append(None)
+                except Exception as e:
+                    print(f"Błąd geokodowania dla {row['Kod pocztowy']}: {e}")
+        except Exception as e:
+            return render(request, 'leads/upload.html', {'error': f'Błąd przetwarzania pliku: {e}'})
         return render_map(request, leads_data)
     return render(request, 'leads/upload.html')
 

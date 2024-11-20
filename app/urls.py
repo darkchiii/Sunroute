@@ -19,5 +19,5 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('leads/', include('leads.urls')),  # Dodaj ścieżki do aplikacji leads
+    path('leads/', include('leads.urls')),
 ]
