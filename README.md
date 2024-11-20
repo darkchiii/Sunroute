@@ -7,12 +7,16 @@ This web application is designed for a photovoltaic company to streamline the wo
 - **Date Filtering**: Select a specific date range to display only relevant leads.
 - **Interactive Map**: View leads on a map with detailed information available on hover or click.
 - **User-Friendly Interface**: Clean and modern design for easy navigation.
+  
+![Image of Visualization Sunroute](https://github.com/darkchiii/Sunroute/blob/main/visualization-sunroute-1.png)
 
 #### Purpose
 The app helps sales teams:
 - Quickly identify lead distribution across regions.
 - Optimize resource allocation and prioritize sales efforts.
 - Enhance operational efficiency by integrating lead data with geographic visualization.
+  
+![Image of Visualization Sunroute](https://github.com/darkchiii/Sunroute/blob/main/visualization-sunroute-2.png)
 
 #### Technologies Used
 - **Backend**: Django (Python)
